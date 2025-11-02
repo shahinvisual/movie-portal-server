@@ -26,12 +26,24 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
         const userCollection = client.db('Movie_Collection').collection('Users');
-
+        const MovieCollection = client.db('Movie_Collection').collection('Movie');
+        // Movie data load and client side show-------------
+        app.get('/movieInfo', async (req, res) => {
+            const allMovieInfo = await MovieCollection.find().toArray();
+            res.send(allMovieInfo)
+        })
         // User-----
-        app.post('/users', async(req, res) => {
-            const newUser = req.body;
-            console.log(newUser);
-            const result = await userCollection.insertOne(newUser);
+        // app.post('/users', async(req, res) => {
+        //     const newUser = req.body;
+        //     console.log(newUser);
+        //     const result = await userCollection.insertOne(newUser);
+        //     res.send(result);
+        // })
+        // User Add Movie Data--------------------
+        app.post('/addMovie', async (req, res) => {
+            const AddMovie = req.body;
+            // console.log(newUser);
+            const result = await MovieCollection.insertOne(AddMovie);
             res.send(result);
         })
         // Send a ping to confirm a successful connection
