@@ -27,6 +27,7 @@ async function run() {
         await client.connect();
         const userCollection = client.db('Movie_Collection').collection('Users');
         const MovieCollection = client.db('Movie_Collection').collection('Movie');
+        const FavoriteCollection = client.db('Movie_Collection').collection('FavoriteMovie');
         // Movie data load and client side show-------------
         app.get('/movieInfo', async (req, res) => {
             const allMovieInfo = await MovieCollection.find().toArray();
@@ -34,10 +35,13 @@ async function run() {
         });
         app.get('/movieDetails/:id', async (req, res) => {
             const id = req.params.id;
-            console.log(id);
             const movieId = { _id: new ObjectId(id) };
-            console.log(movieId);
             const result = await MovieCollection.findOne(movieId);
+            res.send(result)
+        });
+        // Get Favorite Movie List -------------------
+        app.get('/favoriteMovieList', async (req, res) => {
+            const result = await FavoriteCollection.find().toArray();
             res.send(result)
         })
         // User-----
@@ -53,6 +57,13 @@ async function run() {
             // console.log(newUser);
             const result = await MovieCollection.insertOne(AddMovie);
             res.send(result);
+        });
+        // User Add Favorite Data----------
+        app.post('/userFavorite', async (req, res) => {
+            const FavoriteMovie = req.body;
+            const addMovieData = await FavoriteCollection.insertOne(FavoriteMovie)
+            res.send(addMovieData)
+
         })
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
