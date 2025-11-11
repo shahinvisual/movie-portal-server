@@ -39,9 +39,17 @@ async function run() {
             const result = await MovieCollection.findOne(movieId);
             res.send(result)
         });
+        app.get('/updateMovie/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await MovieCollection.findOne(query);
+            res.send(result)
+        })
         // Get Favorite Movie List -------------------
         app.get('/favoriteMovieList', async (req, res) => {
-            const result = await FavoriteCollection.find().toArray();
+            const email = req.query.email;
+            const query = { userEmail: email }
+            const result = await FavoriteCollection.find(query).toArray();
             res.send(result)
         })
         // User-----
@@ -64,6 +72,23 @@ async function run() {
             const addMovieData = await FavoriteCollection.insertOne(FavoriteMovie)
             res.send(addMovieData)
 
+        });
+        // Movie Data Update ---------------------
+        app.put('/movieUpdate/:id', async (req, res) => {
+            const movieInfo = req.body;
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const updateDoc = { $set: movieInfo };
+            const result = await MovieCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        });
+
+        // Delete  Favorite Movie Item ---------------------
+        app.delete('/favoriteMovieDelete/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await FavoriteCollection.deleteOne(query);
+            res.send(result)
         })
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
