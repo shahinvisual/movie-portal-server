@@ -30,8 +30,19 @@ async function run() {
         const FavoriteCollection = client.db('Movie_Collection').collection('FavoriteMovie');
         // Movie data load and client side show-------------
         app.get('/movieInfo', async (req, res) => {
-            const allMovieInfo = await MovieCollection.find().toArray();
-            res.send(allMovieInfo)
+            const search = req.query.search || '';
+            if (!search.trim()) {
+                const allMovieInfo = await MovieCollection.find().toArray();
+                return res.send(allMovieInfo)
+            };
+            const query = {
+                $or: [
+                    { Title: { $regex: search, $options: 'i' } },
+                    { Genre: { $regex: search, $options: 'i' } }
+                ]
+            };
+            const result = await MovieCollection.find(query).toArray();
+            return res.send(result)
         });
         app.get('/movieDetails/:id', async (req, res) => {
             const id = req.params.id;
